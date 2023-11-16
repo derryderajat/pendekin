@@ -22,4 +22,4 @@ jobs:
       - run: npm install  # Install Node.js dependencies
       - run: npm install -g prisma  # Install Prisma globally
       - run: npm install -g nodemon
-      - run: npx prisma init
+      - run: npx prisma migrate deploy
