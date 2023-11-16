@@ -1,0 +1,25 @@
+name: pendekin-CI/CD
+run-name: ${{github.actor}} CI/CD server
+on: [push]
+jobs:
+  check-bats-version:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+      - run: npm install -g bats
+      - run: bats -v
+
+  installing-module:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+      - run: npm install  # Install Node.js dependencies
+      - run: npm install -g prisma  # Install Prisma globally
+      - run: npm install -g nodemon
+      - run: npx prisma init

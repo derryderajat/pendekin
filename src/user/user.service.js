@@ -2,9 +2,18 @@
 // Kenapa dipisah? Supaya tanggung jawabnya ter-isolate, dan functions-nya
 // reusable
 
-const { findUsers, isUserExist, insertUser } = require("./user.repository");
+const {
+  findUsers,
+  isUserExist,
+  insertUser,
+  findUserByUsername,
+  updateUser,
+  changeProfile,
+} = require("./user.repository");
 const Joi = require("joi");
-const hashingPassword = require("../utils/bcrypt");
+
+const { hashingPassword, comparePassword } = require("../utils/bcrypt");
+const { createToken } = require("../utils/jwt");
 const schemaRegister = Joi.object({
   username: Joi.string().alphanum().min(3).max(16).required(),
   email: Joi.string().email().required(),
@@ -26,8 +35,7 @@ const registerUser = async (newUserData) => {
     const { error, value } = await schemaRegister.validateAsync(newUserData);
     if (error) throw new Error(error);
   } catch (validationError) {
-    console.error(validationError); // Log validation error
-    throw new Error(validationError);
+    throw Error(validationError.message);
   }
 
   try {
@@ -47,14 +55,59 @@ const registerUser = async (newUserData) => {
       const newUser = await insertUser(newUserData);
       return newUser;
     } catch (error) {
-      return null;
+      throw error;
     }
   } catch (error) {
-    throw new Error(error); // Log the original error for debugging
+    throw error;
   }
 };
 
+const signinUser = async (username, password) => {
+  try {
+    // check is user exist
+    if (!username && !password) {
+      throw new Error("username or password can't be empty");
+    }
+    const user = await findUserByUsername(username);
+    if (!user) throw new Error("Username is not found");
+
+    let isPasswordCorrect = await comparePassword(password, user.password);
+
+    if (!isPasswordCorrect) {
+      throw new Error("Password is incorrect");
+    }
+
+    let selectedUser = {
+      id: user.id,
+      username: user.username,
+      email: user.email,
+    };
+    // 1 day expired
+    let token = await createToken(selectedUser);
+    return { access_token: token, data: selectedUser };
+  } catch (error) {
+    throw error;
+  }
+};
+
+const updateDataUser = async (username, updatedUserData) => {
+  const user = updateUser(username, updatedUserData);
+  return "User is Updated";
+};
+const uploadImage = async (username, imageURI) => {
+  const user = changeProfile(username, imageURI);
+  return "Profile Image is updated";
+};
+const findByusername = async (username) => {
+  const user = await findUserByUsername(username);
+  if (!user) throw new Error("Username is not found");
+  return user;
+};
 module.exports = {
   getAllUsers,
   registerUser,
+  signinUser,
+  updateDataUser,
+  uploadImage,
+  findByusername,
 };

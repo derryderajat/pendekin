@@ -49,8 +49,38 @@ const isUserExist = async (username, email) => {
   return emailExists + usernameExists;
 };
 
+const findUserByUsername = async (username) => {
+  const user = await prisma.Users.findUnique({
+    where: { username: username },
+  });
+  return user;
+};
+
+const updateUser = async (username, updatedData) => {
+  // console.log(username, updatedData);
+  const updatingData = await prisma.users.update({
+    where: {
+      username: username,
+    },
+    data: updatedData,
+  });
+  return updatingData;
+};
+const changeProfile = async (username, imageUrl) => {
+  // console.log(username, updatedData);
+  const updatingData = await prisma.users.update({
+    where: {
+      username: username,
+    },
+    data: { photo_profile: imageUrl },
+  });
+  return updatingData;
+};
 module.exports = {
   findUsers,
   insertUser,
   isUserExist,
+  findUserByUsername,
+  updateUser,
+  changeProfile,
 };
