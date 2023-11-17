@@ -27,9 +27,9 @@ model Links{
   original       String
   short          String    @unique
   qr_link         String
-  createdAt      DateTime
-  updatedAt      DateTime
-  expirationTime DateTime
+  created_at DateTime  @default(now())
+  updated_at DateTime  @default(now()) @updatedAt
+  expirationTime DateTime?
   user Users @relation(fields: [user_id], references: [id]) 
 }
 

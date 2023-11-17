@@ -9,6 +9,7 @@ const { getAllUsers, updateDataUser, uploadImage } = require("./user.service");
 const router = express.Router();
 const { isAuthenticate, isAuthorize, isUserAvail } = require("../middleware");
 const { storingImage } = require("../uploads/multer/multer.service");
+const { ERR } = require("../helper/Response.template");
 router.get("/users", async (req, res) => {
   const products = await getAllUsers();
   res.status(200).json(products);

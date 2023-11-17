@@ -19,6 +19,7 @@ const isAuthenticate = async (req, res, next) => {
   try {
     const verifiedToken = await verifyToken(token);
     req.user = verifiedToken;
+
     next();
   } catch (error) {
     return res
